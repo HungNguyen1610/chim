@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết loài chim</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="bird-detail-page"> <!-- Added class for specific styling -->
+    <header>
+        <nav>
+            <div class="logo">
+                <a href="home.html">BirdGuide</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="home.html">Trang chủ</a></li>
+                <li><a href="index.html" class="active">Khám phá</a></li>
+                <li><a href="news.html">Tin tức</a></li>
+                <li><a href="about.html">Về chúng tôi</a></li>
+            </ul>
+            <!-- Search bar can be omitted here or kept for consistency -->
+             <div class="search-container">
+                <form action="#" method="GET" onsubmit="window.location.href='index.html?query=' + document.getElementById('bird-search-input-detail').value; return false;">
+                    <input type="text" id="bird-search-input-detail" name="query" placeholder="Tìm kiếm loài chim...">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="home.html">Trang chủ</a> » <a href="index.html">Khám phá</a> » <span id="bird-name-breadcrumb">Chi tiết</span>
+        </div>
+
+        <div class="bird-header">
+            <div class="bird-image">
+                <img id="bird-image-detail" src="" alt="Hình ảnh loài chim">
+            </div>
+            <div class="bird-info-detail">
+                <h1 id="bird-title-detail">Tên loài chim</h1>
+                <!-- You could add scientific name here if available in JSON -->
+                <!-- <p class="scientific-name" id="bird-scientific-name">Scientific name</p> -->
+                <p id="bird-description-detail">Mô tả sẽ hiển thị ở đây...</p>
+            </div>
+        </div>
+        
+        <!-- Potential sections like: Identification, Diet, Habitat, Conservation Status -->
+        <!-- For example:
+        <section class="bird-additional-info">
+            <h2>Identification</h2>
+            <p id="bird-identification">...</p>
+            <h2>Habitat</h2>
+            <p id="bird-habitat">...</p>
+        </section>
+        -->
+
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Quay về danh sách</a>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>BirdGuide</h3>
+                <p>Khám phá thế giới các loài chim cùng chúng tôi.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#">Chính sách bảo mật</a>
+                <a href="#">Điều khoản sử dụng</a>
+                <a href="#">Liên hệ</a>
+            </div>
+        </div>
+        <p class="copyright">© 2025 BirdGuide. Bảo lưu mọi quyền.</p>
+    </footer>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const birdNameQuery = params.get("name");
+
+        async function loadBirdData() {
+            try {
+                const res = await fetch("birds_data.json");
+                if (!res.ok) {
+                    throw new Error(`HTTP error! status: ${res.status}`);
+                }
+                const data = await res.json();
+                const bird = data.find(b => b.name === birdNameQuery);
+
+                if (bird) {
+                    document.title = bird.name + " | BirdGuide";
+                    document.getElementById("bird-name-breadcrumb").textContent = bird.name;
+                    document.getElementById("bird-title-detail").textContent = bird.name; // Use name field, title in JSON is often lowercase
+                    document.getElementById("bird-description-detail").textContent = bird.description || 'Không có mô tả chi tiết.';
+                    document.getElementById("bird-image-detail").src = bird.image_url || 'https://via.placeholder.com/600x400?text=No+Image';
+                    document.getElementById("bird-image-detail").alt = bird.name;
+                    // If you add scientific name to JSON:
+                    // document.getElementById("bird-scientific-name").textContent = bird.scientific_name || '';
+                } else {
+                    document.getElementById("bird-title-detail").textContent = "Không tìm thấy loài chim";
+                    document.getElementById("bird-description-detail").textContent = "Loài chim bạn tìm kiếm không tồn tại hoặc đã bị xóa. Vui lòng quay lại trang danh sách.";
+                    document.getElementById("bird-image-detail").src = 'https://via.placeholder.com/600x400?text=Bird+Not+Found';
+                    document.getElementById("bird-image-detail").alt = "Không tìm thấy loài chim";
+                }
+            } catch (error) {
+                console.error("Could not load bird data:", error);
+                document.getElementById("bird-title-detail").textContent = "Lỗi tải dữ liệu";
+                document.getElementById("bird-description-detail").textContent = "Không thể tải thông tin loài chim. Vui lòng thử lại sau.";
+            }
+        }
+        
+        if (birdNameQuery) {
+            loadBirdData();
+        } else {
+            document.getElementById("bird-title-detail").textContent = "Không có loài chim nào được chọn";
+            document.getElementById("bird-description-detail").textContent = "Vui lòng chọn một loài chim từ trang danh sách.";
+        }
+
+        // Handle search from detail page
+        const detailSearchForm = document.querySelector('.search-container form');
+        const detailSearchInput = document.getElementById('bird-search-input-detail');
+        if (detailSearchForm && detailSearchInput) {
+            detailSearchForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const query = detailSearchInput.value.trim();
+                if (query) {
+                    window.location.href = `index.html?query=${encodeURIComponent(query)}`;
+                }
+            });
+        }
+    </script>
+</body>
+</html>
