@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi tiết loài chim</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Noto Serif', serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            color: #2b2b2b;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .breadcrumb {
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+        .breadcrumb a {
+            text-decoration: none;
+            color: #507746;
+        }
+        .bird-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .bird-image {
+            flex: 1 1 350px;
+        }
+        .bird-image img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .bird-info {
+            flex: 1 1 300px;
+        }
+        .bird-info h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #264d32;
+        }
+        .bird-info p {
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 30px;
+            text-decoration: none;
+            color: #264d32;
+            font-weight: bold;
+        }
+        .back-link i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="breadcrumb">
+            <a href="/">Trang chủ</a> &raquo; <a href="/explore">Khám phá</a> &raquo; <span id="bird-name-short">Chi tiết</span>
+        </div>
+
+        <div class="bird-header">
+            <div class="bird-image">
+                <img id="bird-image" src="" alt="">
+            </div>
+            <div class="bird-info">
+                <h1 id="bird-title">Tên loài chim</h1>
+                <p id="bird-description">Mô tả sẽ hiển thị ở đây...</p>
+            </div>
+        </div>
+
+        <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Quay về danh sách</a>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const birdName = params.get("name");
+
+        async function loadBirdData() {
+            const res = await fetch("birds_data.json");
+            const data = await res.json();
+            const bird = data.find(b => b.name === birdName);
+
+            if (bird) {
+                document.getElementById("bird-name-short").textContent = bird.name;
+                document.getElementById("bird-title").textContent = bird.name;
+                document.getElementById("bird-description").textContent = bird.description || 'Không có mô tả.';
+                document.getElementById("bird-image").src = bird.image_url || 'https://via.placeholder.com/600x400';
+                document.getElementById("bird-image").alt = bird.name;
+            } else {
+                document.getElementById("bird-title").textContent = "Không tìm thấy loài chim.";
+                document.getElementById("bird-description").textContent = "Vui lòng quay lại trang danh sách.";
+            }
+        }
+
+        loadBirdData();
+    </script>
+</body>
+</html>
